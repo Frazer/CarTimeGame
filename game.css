@@ -1,0 +1,14 @@
+h1 {
+  /* set color to cadetblue */
+  color: cadetblue;
+  /* center it horizontally */
+  text-align: center;
+
+}
+
+canvas {
+  /* center it horizontally */
+  display: block;
+  margin: 0 auto;
+  border: 1px solid black;
+}
