@@ -108,19 +108,7 @@ update = ()=>{
   playersCar.x -= playersCar.speed * Math.sin(playersCar.angle);
   playersCar.y += playersCar.speed * Math.cos(playersCar.angle);    
   
-  // make sure the car stays on the screen
-  if(playersCar.x < 0){
-    playersCar.x = 0;
-  }else if(playersCar.x > canvas.width - carWidth){
-    playersCar.x = canvas.width - carWidth;
-  }
-  if(playersCar.y < 0){
-    playersCar.y = 0;
-  }else if(playersCar.y > canvas.height - carHeight){
-    playersCar.y = canvas.height - carHeight;
-  }
-
-  
+  checkBounds(playersCar);
 
   // have the other caars chase the player car
   cars.forEach(car=>{
@@ -130,18 +118,7 @@ update = ()=>{
     car.x -= car.speed * Math.sin(car.angle);
     car.y += car.speed * Math.cos(car.angle);
 
-    // make sure the car stays on the screen
-    if(car.x < 0){
-      car.x = 0;
-    }else if(car.x > canvas.width - carWidth){
-      car.x = canvas.width - carWidth;
-    }
-    if(car.y < 0){
-      car.y = 0;
-    }else if(car.y > canvas.height - carHeight){
-      car.y = canvas.height - carHeight;
-    }
-
+    checkBounds(car);
 
   });
 
@@ -207,5 +184,19 @@ initialize = ()=>{
   }
 
   requestAnimationFrame(tick);
+}
+
+function checkBounds(car) {
+  // make sure the car stays on the screen
+  if (car.x < 0) {
+    car.x = 0;
+  } else if (car.x > canvas.width - carWidth) {
+    car.x = canvas.width - carWidth;
+  }
+  if (car.y < 0) {
+    car.y = 0;
+  } else if (car.y > canvas.height - carHeight) {
+    car.y = canvas.height - carHeight;
+  }
 }
 
