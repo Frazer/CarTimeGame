@@ -50,8 +50,43 @@ var randomCar = (color = randomColor())=>{
     angleDiff: (Math.random() * Math.PI * 0.22) + Math.PI * 0.11,
     speed: Math.random() * 1 + 0.5,
     image: newCarImage(color),
+    topSpeed: Math.random() * 8 + 5,
   }
 }
+
+const accelerate = (car)=>{
+  // accelerate the car smoothly making it harder as it approaches top speed
+
+  //breaking from reverse
+  if(car.speed < 0 ){
+    car.speed = car.speed*0.9;
+  }
+  
+  if(car.speed < car.topSpeed*3/4){
+    car.speed = car.speed + 0.1;
+  }else if(car.speed < car.topSpeed){
+    car.speed = (car.topSpeed - car.speed) * 0.005 + car.speed;
+  }
+}
+
+const reverse = (car)=>{
+  // decelerate the car smoothly making it harder as it approaches top speed
+
+  //breaking from forward
+  if(car.speed > 0 ){
+    car.speed = car.speed*0.9;
+  }
+
+  if(car.speed > -car.topSpeed/4){
+    car.speed = car.speed - 0.1;
+  }else if(car.speed > -car.topSpeed/2){
+    car.speed = (car.topSpeed/2 - car.speed) * 0.005 + car.speed;
+  }
+}
+
+const decelerate = (car)=>{
+  car.speed = car.speed * 0.99
+};
 
 update = ()=>{
 
@@ -62,14 +97,29 @@ update = ()=>{
   }
 
   if(keys["ArrowUp"]){
-    playersCar.speed = playersCar.speed + 0.1;
+    accelerate(playersCar);
   }else if(keys["ArrowDown"]){
-    playersCar.speed = playersCar.speed - 0.1;
+    reverse(playersCar);
+  }else{
+    decelerate(playersCar);
   }
   
   // move the car forward
   playersCar.x -= playersCar.speed * Math.sin(playersCar.angle);
   playersCar.y += playersCar.speed * Math.cos(playersCar.angle);    
+  
+  // make sure the car stays on the screen
+  if(playersCar.x < 0){
+    playersCar.x = 0;
+  }else if(playersCar.x > canvas.width - carWidth){
+    playersCar.x = canvas.width - carWidth;
+  }
+  if(playersCar.y < 0){
+    playersCar.y = 0;
+  }else if(playersCar.y > canvas.height - carHeight){
+    playersCar.y = canvas.height - carHeight;
+  }
+
   
 
   // have the other caars chase the player car
@@ -79,6 +129,19 @@ update = ()=>{
     // move the car forward
     car.x -= car.speed * Math.sin(car.angle);
     car.y += car.speed * Math.cos(car.angle);
+
+    // make sure the car stays on the screen
+    if(car.x < 0){
+      car.x = 0;
+    }else if(car.x > canvas.width - carWidth){
+      car.x = canvas.width - carWidth;
+    }
+    if(car.y < 0){
+      car.y = 0;
+    }else if(car.y > canvas.height - carHeight){
+      car.y = canvas.height - carHeight;
+    }
+
 
   });
 
@@ -135,6 +198,7 @@ initialize = ()=>{
     image: newCarImage('ff0000'),
     angle: 0,
     speed: 0,
+    topSpeed: 13,
   }
 
   cars = [];
