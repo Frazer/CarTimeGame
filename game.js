@@ -103,13 +103,31 @@ update = ()=>{
   }else{
     decelerate(playersCar);
   }
-  
+
+  if(keys["w"]){
+    accelerate(player2Car);
+  }else if(keys["s"]){
+    reverse(player2Car);
+  }else{
+    decelerate(player2Car);
+  }
+
+  if(keys["a"]){
+    player2Car.angle -= Math.PI / 60;
+  }else if(keys["d"]){
+    player2Car.angle += Math.PI / 60;
+  }
+
   // move the car forward
   playersCar.x -= playersCar.speed * Math.sin(playersCar.angle);
-  playersCar.y += playersCar.speed * Math.cos(playersCar.angle);    
+  playersCar.y += playersCar.speed * Math.cos(playersCar.angle);  
+
+  player2Car.x -= player2Car.speed * Math.sin(player2Car.angle);
+  player2Car.y += player2Car.speed * Math.cos(player2Car.angle);
   
   checkBounds(playersCar);
-
+  checkBounds(player2Car);
+  
   // have the other caars chase the player car
   cars.forEach(car=>{
 
@@ -170,9 +188,18 @@ fetch('./car_topview.svg')
 initialize = ()=>{
 
   playersCar = {
-    x: window.innerWidth / 2,
-    y: window.innerHeight / 2,
+    x: window.innerWidth * 0.75,
+    y: window.innerHeight * 0.75,
     image: newCarImage('ff0000'),
+    angle: Math.PI,
+    speed: 0,
+    topSpeed: 13,
+  }
+
+  player2Car = {
+    x: window.innerWidth * 0.25,
+    y: window.innerHeight * 0.25,
+    image: newCarImage('0000ff'),
     angle: 0,
     speed: 0,
     topSpeed: 13,
