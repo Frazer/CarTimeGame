@@ -175,6 +175,10 @@ draw = ()=>{
     drawCar(car);
   });
 
+  drawCar(playersCar);
+
+  drawCar(player2Car);
+
 }
 
 fetch('./car_topview.svg')
