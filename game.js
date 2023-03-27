@@ -47,10 +47,12 @@ var randomCar = (color = randomColor())=>{
   return {
     x: Math.random() * (canvas.width - carWidth),
     y: Math.random() * (canvas.height - carHeight),
+    angle: Math.random() * Math.PI * 2,
     angleDiff: (Math.random() * Math.PI * 0.22) + Math.PI * 0.11,
     speed: Math.random() * 1 + 0.5,
     image: newCarImage(color),
     topSpeed: Math.random() * 8 + 5,
+    acceleration: Math.random() * 0.5 + 0.05,
   }
 }
 
@@ -131,7 +133,13 @@ update = ()=>{
   // have the other caars chase the player car
   cars.forEach(car=>{
 
-    car.angle = Math.atan2(car.y - playersCar.y ,  car.x - playersCar.x)+ Math.PI/4 + car.angleDiff;
+    let angleToTarget = changeDirection(car, playersCar, Math.PI/90);
+
+    if(angleToTarget < Math.PI/6){
+      accelerate(car);
+    }else{
+      decelerate(car);
+    }
     // move the car forward
     car.x -= car.speed * Math.sin(car.angle);
     car.y += car.speed * Math.cos(car.angle);
@@ -140,6 +148,34 @@ update = ()=>{
 
   });
 
+}
+
+const changeDirection = (car, target, maxTurnAngle)=>{
+  let angleToTarget = Math.atan2(car.y - target.y ,  car.x - target.x) + Math.PI/4 + car.angleDiff;
+
+  // Add/subtract 2PI if the target wraps around 
+  if (Math.abs(angleToTarget) > Math.PI) {angleToTarget -= Math.sign(angleToTarget) * 2 * Math.PI;}
+  
+  let differnce = angleToTarget - car.angle;
+  if (Math.abs(differnce) > Math.PI) {differnce -= Math.sign(differnce) * 2 * Math.PI;}
+
+  // Make sure we don't overshoot the turn
+  turnAmount = Math.min(Math.abs(differnce), maxTurnAngle); 
+
+  // Turn left or right depending on which direction is shorter
+  if (differnce > 0){
+    car.angle += turnAmount; 
+  } else {
+    car.angle -= turnAmount; 
+  }
+
+  if(car.angle > Math.PI*2){
+    car.angle -= Math.PI*2;
+  }else if(car.angle < -Math.PI*2){
+    car.angle += Math.PI*2;
+  }
+  
+  return Math.abs(differnce);
 }
 
 tick = ()=>{
@@ -169,8 +205,6 @@ draw = ()=>{
   
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-  drawCar(playersCar);
-
   cars.forEach(car=>{
     drawCar(car);
   });
@@ -198,6 +232,7 @@ initialize = ()=>{
     angle: Math.PI,
     speed: 0,
     topSpeed: 13,
+    acceleration: 0.1,
   }
 
   player2Car = {
@@ -207,6 +242,7 @@ initialize = ()=>{
     angle: 0,
     speed: 0,
     topSpeed: 13,
+    acceleration: 0.1,
   }
 
   cars = [];
