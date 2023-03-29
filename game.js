@@ -12,6 +12,7 @@ window.addEventListener('resize', ()=>{
 
 // set up a keys array
 var keys = [];
+obstacles = [];
 
 // add a keylistener to update the keys array
 document.addEventListener("keydown", (event)=>{
@@ -184,10 +185,8 @@ tick = ()=>{
   requestAnimationFrame(tick);
 }
 
-
 let carWidth = 25;
 let carHeight = 37.5;
-
 
 drawCar = (car)=>{
   
@@ -201,10 +200,20 @@ drawCar = (car)=>{
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
+drawObstacles = ()=>{
+  obstacles.forEach(obstacle=>{
+    ctx.fillStyle = "#78491a";
+    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+    ctx.fillStyle = "white";
+  });
+}
+
 draw = ()=>{
   
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
+  drawObstacles();
+
   cars.forEach(car=>{
     drawCar(car);
   });
@@ -212,7 +221,6 @@ draw = ()=>{
   drawCar(playersCar);
 
   drawCar(player2Car);
-
 }
 
 fetch('./car_topview.svg')
@@ -245,6 +253,8 @@ initialize = ()=>{
     acceleration: 0.1,
   }
 
+  createObstacles();
+
   cars = [];
   for(var i = 0; i < 20; i++){
     cars.push(randomCar());
@@ -252,6 +262,32 @@ initialize = ()=>{
 
   requestAnimationFrame(tick);
 }
+
+const createObstacles = ()=>{
+  // create some obstacles, maaking sure not to overlap with the cars
+  for(var i = 0; i < 10; i++){
+    let obstacle = {
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      width: Math.random() * 100 + 50,
+      height: Math.random() * 100 + 50,
+    }
+    let overlap = false;
+    [playersCar, player2Car].forEach(car=>{
+      if(obstacle.x < car.x + carWidth &&
+        obstacle.x + obstacle.width > car.x &&
+        obstacle.y < car.y + carHeight &&
+        obstacle.y + obstacle.height > car.y){
+          overlap = true;
+        }
+    });
+    if(!overlap){
+      obstacles.push(obstacle);
+    }
+  }
+  
+}
+
 
 function checkBounds(car) {
   // make sure the car stays on the screen
@@ -265,5 +301,17 @@ function checkBounds(car) {
   } else if (car.y > canvas.height - carHeight) {
     car.y = canvas.height - carHeight;
   }
+
+  // check if the car is colliding with any obstacles
+  obstacles.forEach(obstacle=>{
+    if(car.x < obstacle.x + obstacle.width &&
+      car.x + carWidth > obstacle.x &&
+      car.y < obstacle.y + obstacle.height &&
+      car.y + carHeight > obstacle.y){
+        // collision detected!
+        car.speed = car.speed * 0.85;
+      }
+  }
+  );
 }
 
