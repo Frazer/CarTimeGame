@@ -1,1 +1,1 @@
-Playing with cars and copilot
+2 player game, Use wasd and arrows. Written using copilot.
