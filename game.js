@@ -14,6 +14,9 @@ window.addEventListener('resize', ()=>{
 var keys = [];
 obstacles = [];
 
+let highScore = 0;
+let playerWithHighScore = 0;
+
 // add a keylistener to update the keys array
 document.addEventListener("keydown", (event)=>{
   keys[event.key] = true;
@@ -93,6 +96,9 @@ const decelerate = (car)=>{
 
 update = ()=>{
 
+  let p1Contact = false;
+  let p2Contact = false;
+
   if(keys["ArrowLeft"]){
     playersCar.angle -= Math.PI / 60;
   }else if(keys["ArrowRight"]){
@@ -153,7 +159,40 @@ update = ()=>{
 
     checkBounds(car);
 
+    // check if the car is with either plaayer car
+    if(car.x < playersCar.x + carWidth &&
+      car.x + carWidth > playersCar.x &&
+      car.y < playersCar.y + carHeight &&
+      car.y + carHeight > playersCar.y){
+        p1Contact = true;
+      }
+    if(car.x < player2Car.x + carWidth &&
+      car.x + carWidth > player2Car.x &&
+      car.y < player2Car.y + carHeight &&
+      car.y + carHeight > player2Car.y){
+        p2Contact = true;
+      }
+
   });
+
+  playersCar.score++;
+  player2Car.score++;
+
+  if(p1Contact){
+    playersCar.score = 0;
+  }
+  if(p2Contact){
+    player2Car.score = 0;
+  }
+
+  if(playersCar.score > highScore){
+    highScore = playersCar.score;
+    playerWithHighScore = 1;
+  }
+  if(player2Car.score > highScore){
+    highScore = player2Car.score;
+    playerWithHighScore = 2;
+  }
 
 }
 
@@ -227,6 +266,9 @@ draw = ()=>{
   drawCar(playersCar);
 
   drawCar(player2Car);
+
+  drawScores();
+
 }
 
 fetch('./car_topview.svg')
@@ -239,6 +281,9 @@ fetch('./car_topview.svg')
 
 initialize = ()=>{
 
+  highScore = 0;
+  playerWithHighScore = 0;
+
   playersCar = {
     x: window.innerWidth * 0.75,
     y: window.innerHeight * 0.75,
@@ -247,6 +292,7 @@ initialize = ()=>{
     speed: 0,
     topSpeed: 13,
     acceleration: 0.1,
+    score: 0,
   }
 
   player2Car = {
@@ -257,6 +303,7 @@ initialize = ()=>{
     speed: 0,
     topSpeed: 13,
     acceleration: 0.1,
+    score: 0,
   }
 
   createObstacles();
@@ -294,6 +341,22 @@ const createObstacles = ()=>{
   
 }
 
+
+function drawScores() {
+  ctx.font = "30px Arial";
+  ctx.fillStyle = "red";
+  ctx.fillText("Red: " + playersCar.score, canvas.width - 100, canvas.height - 50);
+  ctx.fillStyle = "blue";
+  ctx.fillText("Blue: " + player2Car.score, 10, 50);
+  if(playerWithHighScore == 1){
+    ctx.fillStyle = "red";
+  }else if(playerWithHighScore == 2){
+    ctx.fillStyle = "blue";
+  }else{
+    ctx.fillStyle = "purple";
+  }
+  ctx.fillText("High: " + highScore, 10, canvas.height - 50);
+}
 
 function checkBounds(car) {
   // make sure the car stays on the screen
