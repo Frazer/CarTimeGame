@@ -133,8 +133,14 @@ update = ()=>{
   
   // have the other caars chase the player car
   cars.forEach(car=>{
+    // find the closest playr car
+    let closestPlayerCar = playersCar;
+    let distanceToPlayer1 = (Math.pow(car.x - playersCar.x, 2) + Math.pow(car.y - playersCar.y, 2));
+    if(Math.pow(car.x - player2Car.x, 2) + Math.pow(car.y - player2Car.y, 2) < distanceToPlayer1){
+      closestPlayerCar = player2Car;
+    } 
 
-    let angleToTarget = changeDirection(car, playersCar, Math.PI/90);
+    let angleToTarget = changeDirection(car, closestPlayerCar, Math.PI/90);
 
     if(angleToTarget < Math.PI/6){
       accelerate(car);
